@@ -19,8 +19,8 @@ Build a production-style, accessible data grid with sorting, filtering, paginati
 - [x] **1.3 — Create accessible page structure:** Add the app shell, grid title/accessible name, and native `<table>`, `<thead>`, `<tbody>`, `<th scope="col">`, and button structure. Avoid div-soup.
 - [x] **1.4 — Render typed data:** Render column headers and rows from typed input data; provide a clear empty state and stable row identity.
 - [x] **1.5 — Add sorting:** Support sortable columns, expose current sort direction accessibly, and keep sort state predictable.
-- [ ] **1.6 — Add filtering:** Add labeled filter controls and filter rows without losing the user's context.
-- [ ] **1.7 — Add pagination:** Add page state, page-size handling, and labeled navigation controls; update or clamp the current page when filtering changes the result count.
+- [x] **1.6 — Add filtering:** Add labeled filter controls and filter rows without losing the user's context.
+- [x] **1.7 — Add pagination:** Add page state, page-size handling, and labeled navigation controls; update or clamp the current page when filtering changes the result count.
 - [ ] **1.8 — Add keyboard navigation and selection:** Support Up/Down/Left/Right movement among grid cells, Enter to select, and Space to toggle as specified. Use `keydown` and `e.key`/`e.code`; prevent browser scrolling only when an arrow key is handled by the grid.
 - [ ] **1.9 — Meet accessibility criteria:** Add appropriate table/grid semantics and ARIA only where needed, visible focus, screen-reader labels/status feedback, and contrast of at least 4.5:1.
 - [ ] **1.10 — Responsive and visual polish:** Ensure the grid remains usable at narrow viewport widths and all controls have clear focus, hover, and disabled states.

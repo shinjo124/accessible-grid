@@ -19,12 +19,20 @@ const data: TeamMember[] = [
   { name: 'Avery Chen', role: 'Product Designer', location: 'Singapore', tasksCompleted: 18 },
   { name: 'Jordan Patel', role: 'Frontend Engineer', location: 'Ho Chi Minh City', tasksCompleted: 7 },
   { name: 'Sam Rivera', role: 'Accessibility Specialist', location: 'Manila', tasksCompleted: 12 },
+  { name: 'Morgan Lee', role: 'QA Engineer', location: 'Singapore', tasksCompleted: 15 },
+  { name: 'Taylor Nguyen', role: 'Frontend Engineer', location: 'Ho Chi Minh City', tasksCompleted: 9 },
+  { name: 'Casey Santos', role: 'Product Manager', location: 'Manila', tasksCompleted: 21 },
+  { name: 'Riley Wong', role: 'UX Researcher', location: 'Singapore', tasksCompleted: 11 },
+  { name: 'Alex Tran', role: 'QA Engineer', location: 'Ho Chi Minh City', tasksCompleted: 6 },
 ];
 
 type SortDirection = 'ascending' | 'descending';
 
 let sortKey: keyof TeamMember | null = null;
 let sortDirection: SortDirection = 'ascending';
+let filterQuery = '';
+let currentPage = 0;
+const pageSize = 5;
 
 function appendText(parent: Node, value: string): void {
   parent.appendChild(document.createTextNode(value));
@@ -41,6 +49,19 @@ const heading = document.createElement('h1');
 appendText(heading, 'Team directory');
 main.appendChild(heading);
 
+const filterLabel = document.createElement('label');
+filterLabel.htmlFor = 'team-filter';
+appendText(filterLabel, 'Filter team members');
+const filterInput = document.createElement('input');
+filterInput.id = 'team-filter';
+filterInput.type = 'text';
+filterInput.addEventListener('input', () => {
+  filterQuery = filterInput.value.trim().toLocaleLowerCase();
+  currentPage = 0;
+  renderTable();
+});
+main.append(filterLabel, filterInput);
+
 const table = document.createElement('table');
 const caption = document.createElement('caption');
 appendText(caption, 'Team members');
@@ -50,6 +71,26 @@ const head = document.createElement('thead');
 table.appendChild(head);
 const body = document.createElement('tbody');
 table.appendChild(body);
+
+const pagination = document.createElement('nav');
+pagination.setAttribute('aria-label', 'Table pagination');
+const previousButton = document.createElement('button');
+previousButton.type = 'button';
+appendText(previousButton, 'Previous');
+previousButton.addEventListener('click', () => {
+  currentPage -= 1;
+  renderTable();
+});
+const pageStatus = document.createElement('span');
+pageStatus.setAttribute('aria-live', 'polite');
+const nextButton = document.createElement('button');
+nextButton.type = 'button';
+appendText(nextButton, 'Next');
+nextButton.addEventListener('click', () => {
+  currentPage += 1;
+  renderTable();
+});
+pagination.append(previousButton, pageStatus, nextButton);
 
 function compareValues(left: string | number, right: string | number): number {
   if (typeof left === 'number' && typeof right === 'number') {
@@ -63,15 +104,23 @@ function compareValues(left: string | number, right: string | number): number {
 }
 
 function renderRows(): void {
+  const filteredData = data.filter((item) =>
+    Object.values(item).some((value) =>
+      String(value).toLocaleLowerCase().includes(filterQuery),
+    ),
+  );
   const key = sortKey;
   const sortedData = key
-    ? [...data].sort((left, right) => {
+    ? [...filteredData].sort((left, right) => {
         const result = compareValues(left[key], right[key]);
         return sortDirection === 'ascending' ? result : -result;
       })
-    : data;
+    : filteredData;
+  const pageCount = Math.max(1, Math.ceil(sortedData.length / pageSize));
+  currentPage = Math.min(currentPage, pageCount - 1);
+  const pageData = sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
-  const rows = sortedData.map((item) => {
+  const rows = pageData.map((item) => {
     const row = document.createElement('tr');
 
     for (const column of columns) {
@@ -83,7 +132,19 @@ function renderRows(): void {
     return row;
   });
 
+  if (rows.length === 0) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = columns.length;
+    appendText(cell, 'No team members match your filter.');
+    row.appendChild(cell);
+    rows.push(row);
+  }
+
   body.replaceChildren(...rows);
+  pageStatus.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+  previousButton.disabled = currentPage === 0;
+  nextButton.disabled = currentPage >= pageCount - 1;
 }
 
 function renderHeaders(): void {
@@ -134,4 +195,5 @@ function renderTable(): void {
 renderHeaders();
 renderTable();
 main.appendChild(table);
+main.appendChild(pagination);
 app.replaceChildren(main);
