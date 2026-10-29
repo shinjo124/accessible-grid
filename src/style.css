@@ -38,3 +38,14 @@ td {
 th {
   background: #e8edf5;
 }
+
+td:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #175cd3;
+  outline-offset: 2px;
+}
+
+tr.is-selected td {
+  background: #dceafe;
+}
