@@ -27,13 +27,14 @@ const data: TeamMember[] = [
 ];
 
 type SortDirection = 'ascending' | 'descending';
+type ActiveCell = { row: number; col: number };
 
 let sortKey: keyof TeamMember | null = null;
 let sortDirection: SortDirection = 'ascending';
 let filterQuery = '';
 let currentPage = 0;
 const pageSize = 5;
-let activeCell = { row: 0, column: 0 };
+let activeCell: ActiveCell = { row: 0, col: 0 };
 let selectedMember: TeamMember | null = null;
 let visibleData: TeamMember[] = [];
 
@@ -109,6 +110,8 @@ function compareValues(left: string | number, right: string | number): number {
 }
 
 function renderRows(): void {
+  const shouldRefocus = table.contains(document.activeElement)
+    || pagination.contains(document.activeElement);
   const filteredData = data.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLocaleLowerCase().includes(filterQuery),
@@ -126,7 +129,7 @@ function renderRows(): void {
   const pageData = sortedData.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
   visibleData = pageData;
   activeCell.row = Math.min(activeCell.row, Math.max(0, pageData.length - 1));
-  activeCell.column = Math.min(activeCell.column, columns.length - 1);
+  activeCell.col = Math.min(activeCell.col, columns.length - 1);
 
   const rows = pageData.map((item, rowIndex) => {
     const row = document.createElement('tr');
@@ -136,7 +139,7 @@ function renderRows(): void {
 
     columns.forEach((column, columnIndex) => {
       const cell = document.createElement('td');
-      cell.tabIndex = rowIndex === activeCell.row && columnIndex === activeCell.column ? 0 : -1;
+      cell.tabIndex = rowIndex === activeCell.row && columnIndex === activeCell.col ? 0 : -1;
       appendText(cell, String(item[column.accessorKey]));
       row.appendChild(cell);
     });
@@ -157,10 +160,13 @@ function renderRows(): void {
   pageStatus.textContent = `Page ${currentPage + 1} of ${pageCount}`;
   previousButton.disabled = currentPage === 0;
   nextButton.disabled = currentPage >= pageCount - 1;
+  if (shouldRefocus) {
+    focusActiveCell();
+  }
 }
 
 function focusActiveCell(): void {
-  body.rows[activeCell.row]?.cells[activeCell.column]?.focus();
+  body.rows[activeCell.row]?.cells[activeCell.col]?.focus();
 }
 
 body.addEventListener('focusin', (event: FocusEvent) => {
@@ -176,7 +182,7 @@ body.addEventListener('focusin', (event: FocusEvent) => {
     return;
   }
 
-  activeCell = { row: rowIndex, column: cell.cellIndex };
+  activeCell = { row: rowIndex, col: cell.cellIndex };
   body.querySelectorAll<HTMLTableCellElement>('td').forEach((item) => {
     item.tabIndex = item === cell ? 0 : -1;
   });
@@ -194,14 +200,14 @@ body.addEventListener('keydown', (event: KeyboardEvent) => {
   if (rowIndex < 0) {
     return;
   }
-  activeCell = { row: rowIndex, column: cell.cellIndex };
+  activeCell = { row: rowIndex, col: cell.cellIndex };
 
   if (event.key.startsWith('Arrow')) {
     event.preventDefault();
     const rowDelta = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0;
     const columnDelta = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     const nextRow = body.rows[activeCell.row + rowDelta];
-    const nextCell = nextRow?.cells[activeCell.column + columnDelta];
+    const nextCell = nextRow?.cells[activeCell.col + columnDelta];
 
     if (nextCell) {
       body.querySelectorAll<HTMLTableCellElement>('td[tabindex="0"]').forEach((active) => {
@@ -209,7 +215,7 @@ body.addEventListener('keydown', (event: KeyboardEvent) => {
       });
       nextCell.tabIndex = 0;
       nextCell.focus();
-      activeCell = { row: activeCell.row + rowDelta, column: activeCell.column + columnDelta };
+      activeCell = { row: activeCell.row + rowDelta, col: activeCell.col + columnDelta };
     }
     return;
   }
@@ -218,14 +224,12 @@ body.addEventListener('keydown', (event: KeyboardEvent) => {
     selectedMember = dataForActiveRow();
     renderRows();
     selectionStatus.textContent = selectedMember ? `Selected ${selectedMember.name}.` : '';
-    focusActiveCell();
   } else if (event.key === ' ') {
     event.preventDefault();
     const member = dataForActiveRow();
     selectedMember = selectedMember === member ? null : member;
     renderRows();
     selectionStatus.textContent = selectedMember ? `Selected ${selectedMember.name}.` : 'Selection cleared.';
-    focusActiveCell();
   }
 });
 
