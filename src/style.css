@@ -6,6 +6,12 @@
   text-rendering: optimizeLegibility;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 2rem;
@@ -16,8 +22,16 @@ main {
   margin: 0 auto;
 }
 
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.25rem;
+  overscroll-behavior-x: contain;
+}
+
 table {
   width: 100%;
+  min-width: 42rem;
   border-collapse: collapse;
   background: #fff;
 }
@@ -39,6 +53,7 @@ th {
   background: #e8edf5;
 }
 
+.table-scroll[role="region"]:focus-visible,
 td:focus-visible,
 button:focus-visible,
 input:focus-visible {
@@ -46,6 +61,71 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+label {
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+input {
+  min-height: 2rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #596579;
+  border-radius: 0.25rem;
+  color: #172033;
+  background: #fff;
+}
+
+button {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid #174ea6;
+  border-radius: 0.25rem;
+  color: #fff;
+  background: #174ea6;
+  cursor: pointer;
+}
+
+th button {
+  border-color: transparent;
+  color: #172033;
+  background: transparent;
+}
+
+button:disabled {
+  border-color: #aab3c2;
+  color: #343c4a;
+  background: #e8edf5;
+  cursor: not-allowed;
+}
+
+nav[aria-label="Pagination"] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+nav[aria-label="Pagination"] span {
+  margin: 0 0.25rem;
+}
+
 tr.is-selected td {
   background: #dceafe;
+}
+
+.selection-indicator {
+  display: inline-block;
+  margin-inline-start: 0.5rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  color: #fff;
+  background: #174ea6;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 30rem) {
+  body {
+    padding: 1rem;
+  }
 }

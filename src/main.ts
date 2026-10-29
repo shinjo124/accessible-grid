@@ -65,6 +65,11 @@ filterInput.addEventListener('input', () => {
 });
 main.append(filterLabel, filterInput);
 
+const tableRegion = document.createElement('div');
+tableRegion.className = 'table-scroll';
+tableRegion.setAttribute('role', 'region');
+tableRegion.setAttribute('aria-label', 'Team members table');
+tableRegion.tabIndex = 0;
 const table = document.createElement('table');
 table.setAttribute('role', 'grid');
 const caption = document.createElement('caption');
@@ -144,6 +149,13 @@ function renderRows(): void {
       const cell = document.createElement('td');
       cell.tabIndex = rowIndex === activeCell.row && columnIndex === activeCell.col ? 0 : -1;
       appendText(cell, String(item[column.accessorKey]));
+      if (isSelected && columnIndex === 0) {
+        const marker = document.createElement('span');
+        marker.className = 'selection-indicator';
+        marker.setAttribute('aria-hidden', 'true');
+        appendText(marker, 'Selected');
+        cell.append(' ', marker);
+      }
       row.appendChild(cell);
     });
 
@@ -290,7 +302,8 @@ function renderTable(): void {
 
 renderHeaders();
 renderTable();
-main.appendChild(table);
+tableRegion.appendChild(table);
+main.appendChild(tableRegion);
 main.appendChild(pagination);
 main.appendChild(selectionStatus);
 app.replaceChildren(main);
