@@ -57,7 +57,6 @@ filterInput.id = 'team-filter';
 filterInput.type = 'text';
 filterInput.addEventListener('input', () => {
   filterQuery = filterInput.value.trim().toLocaleLowerCase();
-  currentPage = 0;
   renderTable();
 });
 main.append(filterLabel, filterInput);
@@ -73,16 +72,17 @@ const body = document.createElement('tbody');
 table.appendChild(body);
 
 const pagination = document.createElement('nav');
-pagination.setAttribute('aria-label', 'Table pagination');
+pagination.setAttribute('aria-label', 'Pagination');
 const previousButton = document.createElement('button');
 previousButton.type = 'button';
-appendText(previousButton, 'Previous');
+appendText(previousButton, 'Prev');
 previousButton.addEventListener('click', () => {
   currentPage -= 1;
   renderTable();
 });
 const pageStatus = document.createElement('span');
 pageStatus.setAttribute('aria-live', 'polite');
+pageStatus.setAttribute('aria-current', 'page');
 const nextButton = document.createElement('button');
 nextButton.type = 'button';
 appendText(nextButton, 'Next');
