@@ -66,6 +66,7 @@ filterInput.addEventListener('input', () => {
 main.append(filterLabel, filterInput);
 
 const table = document.createElement('table');
+table.setAttribute('role', 'grid');
 const caption = document.createElement('caption');
 appendText(caption, 'Team members');
 table.appendChild(caption);
@@ -133,7 +134,9 @@ function renderRows(): void {
 
   const rows = pageData.map((item, rowIndex) => {
     const row = document.createElement('tr');
-    if (item === selectedMember) {
+    const isSelected = item === selectedMember;
+    row.setAttribute('aria-selected', String(isSelected));
+    if (isSelected) {
       row.classList.add('is-selected');
     }
 
@@ -157,7 +160,10 @@ function renderRows(): void {
   }
 
   body.replaceChildren(...rows);
-  pageStatus.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+  const firstResult = sortedData.length ? currentPage * pageSize + 1 : 0;
+  const lastResult = Math.min((currentPage + 1) * pageSize, sortedData.length);
+  const sortedBy = key ? `, sorted by ${columns.find((column) => column.accessorKey === key)?.header}` : '';
+  pageStatus.textContent = `Showing ${firstResult}-${lastResult} of ${sortedData.length}${sortedBy}.`;
   previousButton.disabled = currentPage === 0;
   nextButton.disabled = currentPage >= pageCount - 1;
   if (shouldRefocus) {
